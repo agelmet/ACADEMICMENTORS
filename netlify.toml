@@ -1,0 +1,11 @@
+# Static site + the Advon Editor function (text edits are stored in Netlify Blobs — no deploy per edit)
+[build]
+  publish = "."
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-cache"

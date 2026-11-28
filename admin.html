@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="light only">
+<title>Admin Panel · Academic Mentors</title>
+<style>
+:root{color-scheme:light only;--acc:#C9432F;--ink:#161A22;--mute:#5F6777;--line:#E3E6EC;--bg:#F5F6F8;--card:#fff;--warn:#F5A623;--ok:#1E8E5A;--bad:#C0392B}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-weight:600;min-height:42px;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{border-color:#C9CEDA}.btn:active{transform:scale(.98)}
+.btn-p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn-pub{background:#FFD23F;border-color:#E8B800;color:#2A2200}
+.btn-pub[disabled]{background:#EEF0F3;border-color:var(--line);color:#9AA1AE;cursor:default}
+.lnk{border:0;background:none;color:var(--acc);font-weight:600;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+/* login */
+#login{min-height:100%;display:grid;place-items:center;padding:24px}
+.lg{width:min(440px,100%);background:var(--card);border-radius:20px;padding:34px 30px;box-shadow:0 24px 60px rgba(20,28,45,.12),0 2px 6px rgba(20,28,45,.06)}
+.lg .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:10px}
+.lg h1{font-size:26px;line-height:1.2;margin:0 0 8px}
+.lg p{margin:0 0 18px;color:var(--mute)}
+.lg input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:17px;margin-bottom:12px}
+.lg input:focus,.f textarea:focus,.pl input:focus{outline:2px solid var(--acc);outline-offset:1px;border-color:var(--acc)}
+.lg .btn{width:100%;font-size:16px;min-height:50px}
+.lg .err{color:var(--bad);font-weight:600;min-height:22px;margin:8px 0 0}
+.trialnote{background:#FFF7D6;border:1px solid #F1DC8A;border-radius:12px;padding:12px 14px;color:#4A3C00;font-size:14px;margin:0 0 16px}
+/* app */
+#app{display:flex;flex-direction:column;height:100%}
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);flex:none}
+.top .nm{font-weight:800;font-size:16px;white-space:nowrap}.top .nm small{display:block;font-weight:600;font-size:11.5px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase}
+.top .sp{flex:1}
+.st{font-size:13.5px;font-weight:600;color:var(--mute);display:flex;align-items:center;gap:7px}
+.st i{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block}.st.dirty i{background:var(--warn)}.st.dirty{color:#7A5200}
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:290px minmax(380px,1fr) minmax(0,1.15fr)}
+.pl{border-right:1px solid var(--line);background:#fff;display:flex;flex-direction:column;min-height:0}
+.pl .hd{padding:12px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 4px;font-weight:700;font-size:13px}
+.tabs button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pl input{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.pl ul{list-style:none;margin:0;padding:8px;overflow:auto;flex:1}
+.pl li button{width:100%;text-align:left;border:0;background:none;border-radius:9px;padding:9px 10px;display:flex;gap:8px;align-items:baseline;line-height:1.3}
+.pl li button:hover{background:#F2F4F7}.pl li button[aria-current=true]{background:color-mix(in srgb,var(--acc) 12%,#fff);font-weight:700}
+.pl li .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:none;visibility:hidden;transform:translateY(-1px)}.pl li .dot.on{visibility:visible}
+.pl li.star button{font-weight:700}
+.pl li small{display:block;color:var(--mute);font-size:12px;font-weight:500}
+.fl{overflow:auto;min-height:0;padding:20px 22px 120px}
+.fl h2{font-size:22px;line-height:1.25;margin:0 0 4px}
+.fl .sub{color:var(--mute);margin:0 0 18px;font-size:14px}
+.f{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px 10px;margin:0 0 10px;transition:border-color .15s,box-shadow .15s}
+.f.h{border-left:4px solid var(--acc);margin-top:22px}
+.f.ch{border-color:#E9C46A;box-shadow:0 0 0 3px rgba(245,166,35,.12)}
+.f.bad{border-color:var(--bad)}
+.f .lb{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.f .lb b{color:#7A5200;font-weight:700;text-transform:none;letter-spacing:0}
+.f textarea{display:block;width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;resize:none;overflow:hidden;line-height:1.5;background:#FCFCFD;min-height:42px}
+.f.h textarea{font-weight:700;font-size:16.5px}
+.f .ft{display:none;flex-wrap:wrap;align-items:center;gap:4px 16px;margin-top:8px;font-size:13px;color:var(--mute)}.f.ed .ft{display:flex}
+.f .ft label{display:flex;gap:7px;align-items:center;cursor:pointer}
+.f .msg{color:var(--bad);font-weight:600;font-size:13px;margin-top:6px}
+.f .hint{font-size:12.5px;color:var(--mute);margin-top:6px}
+.empty{color:var(--mute);padding:40px 0;text-align:center}
+.pv{border-left:1px solid var(--line);background:#E9ECF1;display:flex;flex-direction:column;min-height:0}
+.pv .bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fff;border-bottom:1px solid var(--line);font-size:13px;color:var(--mute)}
+.pv .bar .sp{flex:1}.pv .bar button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-weight:600;font-size:13px;min-height:34px}
+.pv .bar button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pv .box{flex:1;min-height:0;overflow:hidden;position:relative}
+.pv iframe{border:0;background:#fff;position:absolute;left:0;top:0;transform-origin:0 0}
+.pv .box.ph{display:grid;place-items:start center;overflow:auto;padding:14px 0}
+.pv .box.ph iframe{position:static;transform:none;width:390px;height:780px;border-radius:22px;box-shadow:0 14px 40px rgba(20,28,45,.2)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:50;max-width:min(92vw,560px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.ov{position:fixed;inset:0;background:rgba(15,20,30,.45);display:grid;place-items:center;padding:18px;z-index:40}
+.dlg{background:#fff;border-radius:18px;padding:26px 26px 20px;width:min(600px,100%);max-height:88vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.dlg h3{margin:0 0 10px;font-size:21px}.dlg ol{padding-left:20px;margin:0 0 14px}.dlg li{margin:0 0 9px}.dlg .row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.mob{display:none}
+@media (max-width:1100px){
+ .cols{grid-template-columns:1fr}.pl,.pv{display:none}.mob{display:block;padding:12px 14px 0}
+ .mob select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;font-weight:600}
+ .fl{padding:14px 14px 130px}.top{flex-wrap:wrap;padding:10px 12px}.top .sp{display:none}.st{order:5;width:100%}
+ .top .hide-m{display:none}
+ #app.showpv .pv{display:flex;position:fixed;inset:0;z-index:30;border:0}
+ #app.showpv .pv .box iframe{position:static;transform:none;width:100%;height:100%}
+ .fab{position:fixed;right:14px;bottom:14px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+}
+@media (min-width:1101px){.fab,.pv .bar .close{display:none}}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="lg">
+    <span class="tag">Admin Panel</span>
+    <h1>Academic Mentors</h1>
+    <div id="lgTrial" hidden>
+      <p class="trialnote"><strong>Δοκιμαστική λειτουργία.</strong> Εδώ μπορείτε να δοκιμάσετε ελεύθερα: οι αλλαγές σας φαίνονται μόνο σε αυτή τη συσκευή. Όταν η ιστοσελίδα βγει live, θα μπαίνετε με τον προσωπικό σας κωδικό και οι αλλαγές θα φαίνονται σε όλους.</p>
+      <button class="btn btn-p" id="goTrial" type="button">Είσοδος</button>
+    </div>
+    <form id="lgLive" hidden autocomplete="off">
+      <p>Γράψτε τον κωδικό σας για να αλλάξετε τα κείμενα της ιστοσελίδας.</p>
+      <input id="pass" type="password" inputmode="text" autocomplete="current-password" aria-label="Κωδικός" placeholder="Κωδικός">
+      <button class="btn btn-p" type="submit">Είσοδος</button>
+      <p class="err" id="lgErr" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="nm">Academic Mentors<small>Admin Panel</small></div>
+    <div class="st" id="st"><i></i><span id="stT">Όλα δημοσιευμένα</span></div>
+    <div class="sp"></div>
+    <button class="btn hide-m" id="bHelp" type="button">Οδηγίες</button>
+    <button class="btn" id="bMore" type="button" aria-haspopup="dialog">Περισσότερα</button>
+    <button class="btn btn-pub" id="bPub" type="button" disabled>Δημοσίευση</button>
+  </header>
+  <div class="mob"><div class="tabs" id="mTabs" hidden></div><select id="mSel" aria-label="Σελίδα"></select></div>
+  <div class="cols">
+    <aside class="pl">
+      <div class="hd">
+        <div class="tabs" id="tabs" hidden></div>
+        <input id="q" type="search" placeholder="Αναζήτηση σελίδας…" aria-label="Αναζήτηση σελίδας">
+      </div>
+      <ul id="pages"></ul>
+    </aside>
+    <main class="fl" id="fl"><p class="empty">Φόρτωση…</p></main>
+    <section class="pv" aria-label="Προεπισκόπηση">
+      <div class="bar"><span>Προεπισκόπηση</span><span class="sp"></span>
+        <button type="button" id="dvD" aria-pressed="true">Υπολογιστής</button><button type="button" id="dvP" aria-pressed="false">Κινητό</button>
+        <button type="button" class="close" id="pvClose">Κλείσιμο</button></div>
+      <div class="box" id="box"><iframe id="pv" name="aded-prev" title="Προεπισκόπηση σελίδας"></iframe></div>
+    </section>
+  </div>
+  <button class="btn btn-p fab" id="fab" type="button">Προεπισκόπηση</button>
+</div>
+
+<div class="ov" id="ovHelp" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="hT">
+  <h3 id="hT">Πώς αλλάζω ένα κείμενο</h3>
+  <ol>
+    <li><strong>Διαλέξτε σελίδα</strong> από τη λίστα αριστερά (ή από το μενού επάνω στο κινητό).</li>
+    <li><strong>Γράψτε το νέο κείμενο</strong> στο κουτί του. Δεξιά βλέπετε αμέσως πώς θα φαίνεται. Αν πατήσετε πάνω σε ένα κείμενο στην προεπισκόπηση, ανοίγει το κουτί του.</li>
+    <li>Πατήστε το κίτρινο κουμπί <strong>«Δημοσίευση»</strong>. Μέχρι να το πατήσετε, δεν αλλάζει τίποτα στην ιστοσελίδα.</li>
+  </ol>
+  <p><strong>Αγκύλες ⟦ ⟧:</strong> όπου τις δείτε, οι λέξεις μέσα τους είναι έντονες ή σύνδεσμος. Αλλάζετε ελεύθερα τις λέξεις, αφήνετε όμως τις αγκύλες στη θέση τους.</p>
+  <p><strong>Μενού &amp; υποσέλιδο:</strong> είναι ίδια σε όλες τις σελίδες, γι’ αυτό τα αλλάζετε μία φορά, από την πρώτη επιλογή της λίστας.</p>
+  <p><strong>Κάνατε λάθος;</strong> «Επαναφορά» κάτω από κάθε κουτί φέρνει πίσω το αρχικό κείμενο. Στο «Περισσότερα» υπάρχει και «Αναίρεση τελευταίας δημοσίευσης».</p>
+  <p>Για νέα σελίδα, νέο άρθρο ή αλλαγή στον σχεδιασμό, στείλτε μας μήνυμα.</p>
+  <div class="row"><button class="btn btn-p" type="button" data-close>Κατάλαβα</button></div>
+</div></div>
+
+<div class="ov" id="ovMore" hidden><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="mT">
+  <h3 id="mT">Περισσότερα</h3>
+  <p><button class="lnk" type="button" id="bUndo">Αναίρεση τελευταίας δημοσίευσης</button><br><span style="color:var(--mute);font-size:13.5px">Η ιστοσελίδα γυρίζει όπως ήταν πριν από την τελευταία «Δημοσίευση».</span></p>
+  <p><button class="lnk" type="button" id="bDiscard">Απόρριψη όσων δεν έχω δημοσιεύσει</button><br><span style="color:var(--mute);font-size:13.5px">Σβήνει τις αλλαγές που γράψατε αλλά δεν έχετε δημοσιεύσει.</span></p>
+  <p><button class="lnk" type="button" id="bHelp2">Οδηγίες</button> &nbsp;·&nbsp; <a class="lnk" id="aSite" href="./" target="_blank" rel="noopener">Άνοιγμα ιστοσελίδας</a> &nbsp;·&nbsp; <button class="lnk" type="button" id="bOut">Έξοδος</button></p>
+  <div class="row"><button class="btn" type="button" data-close>Κλείσιμο</button></div>
+</div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>window.ADED_LIB=1</script>
+<script src="assets/ed/ed.js"></script>
+<script>
+(function(){
+'use strict';
+var SITE='academicmentors',E=window.AdvonEd,$=function(i){return document.getElementById(i)};
+var TRIAL=/(^|\.)drafts\.advonmedia\.com$|github\.io$|^localhost$|^127\./.test(location.hostname)||location.protocol==='file:';
+var K={draft:'aded:draft:'+SITE,trial:'aded:trial:'+SITE,tprev:'aded:trialprev:'+SITE,tok:'aded:tok:'+SITE};
+var cfg,pub={v:1,t:'',pages:{},all:{}},draft,cur=null,lang='',token='',fields=[],focusK='',dev='d';
+var LAB={H1:'Κύριος τίτλος',H2:'Τίτλος ενότητας',H3:'Τίτλος',H4:'Τίτλος',H5:'Τίτλος',H6:'Τίτλος',P:'Κείμενο',LI:'Στοιχείο λίστας',A:'Σύνδεσμος / κουμπί',BUTTON:'Κουμπί',SUMMARY:'Ερώτηση',TD:'Πίνακας',TH:'Πίνακας',FIGCAPTION:'Λεζάντα',BLOCKQUOTE:'Παράθεμα',LABEL:'Ετικέτα',DT:'Όρος',DD:'Περιγραφή',STRONG:'Έντονο κείμενο',B:'Έντονο κείμενο',EM:'Κείμενο',SPAN:'Κείμενο',DIV:'Κείμενο',SMALL:'Μικρό κείμενο',TIME:'Ημερομηνία'};
+var LANGN={el:'Ελληνικά',en:'English',es:'Español'};
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function copy(o){return JSON.parse(JSON.stringify(o))}
+function toast(t){var x=$('toast');x.textContent=t;x.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){x.classList.remove('on')},3800)}
+function api(act,body){return fetch('api/ed/'+act,{method:body?'POST':'GET',headers:body?{'content-type':'application/json','x-ed-token':token}:{},body:body?JSON.stringify(body):undefined,cache:'no-store'}).then(function(r){return r.json().then(function(j){j._s=r.status;return j})})}
+
+/* ---- state helpers ---- */
+function val(k,p){if(k.charAt(0)==='c')return draft.all[k];var m=draft.pages[p];return m&&m[k]!==undefined?m[k]:draft.all[k]}
+function pval(k,p){if(k.charAt(0)==='c')return pub.all[k];var m=pub.pages[p];return m&&m[k]!==undefined?m[k]:pub.all[k]}
+function setVal(f,v,all){
+  var k=f.k,p=cur.p,m;
+  if(k.charAt(0)==='c'||all){if(v===f.d)delete draft.all[k];else draft.all[k]=v;if(draft.pages[p])delete draft.pages[p][k]}
+  else{m=draft.pages[p]||(draft.pages[p]={});if(v===f.d)delete m[k];else m[k]=v;delete draft.all[k]}
+  if(draft.pages[p]&&!Object.keys(draft.pages[p]).length)delete draft.pages[p];
+  ls(K.draft,draft);status();reloadPv();
+}
+function flat(c){var o={},k,p;for(k in c.all)o['*|'+k]=c.all[k];for(p in c.pages)for(k in c.pages[p])o[p+'|'+k]=c.pages[p][k];return o}
+function diff(){var a=flat(draft),b=flat(pub),n=0,k,pg={};for(k in a)if(a[k]!==b[k]){n++;pg[k.split('|')[0]]=1}for(k in b)if(!(k in a)){n++;pg[k.split('|')[0]]=1}return{n:n,pg:pg}}
+function status(){
+  var d=diff(),s=$('st');s.classList.toggle('dirty',d.n>0);
+  $('stT').textContent=d.n?(d.n===1?'1 αλλαγή περιμένει δημοσίευση':d.n+' αλλαγές περιμένουν δημοσίευση'):'Όλα δημοσιευμένα';
+  $('bPub').disabled=!d.n;
+  [].forEach.call(document.querySelectorAll('#pages .dot'),function(x){var p=x.getAttribute('data-p');x.classList.toggle('on',!!d.pg[p]||(p.indexOf('__c')===0&&!!d.pg['*']))});
+}
+
+/* ---- page list ---- */
+function plist(){
+  var q=($('q').value||'').toLowerCase().trim(),ul=$('pages'),sel=$('mSel'),h='',o='';
+  var arr=[{p:'__c:'+lang,f:cfg.home[lang],t:'Μενού & υποσέλιδο',s:'Ίδια σε όλες τις σελίδες',chrome:true,l:lang}].concat(cfg.pages.filter(function(x){return x.l===lang}));
+  arr.forEach(function(x,i){
+    if(q&&(x.t+' '+x.p).toLowerCase().indexOf(q)<0)return;
+    h+='<li'+(x.chrome?' class="star"':'')+'><button type="button" data-i="'+i+'"'+(cur&&cur.p===x.p?' aria-current="true"':'')+'><span class="dot" data-p="'+esc(x.p)+'"></span><span>'+esc(x.t)+(x.s?'<small>'+esc(x.s)+'</small>':'')+'</span></button></li>';
+    o+='<option value="'+i+'"'+(cur&&cur.p===x.p?' selected':'')+'>'+esc(x.t)+'</option>';
+  });
+  ul.innerHTML=h||'<li class="empty">Δεν βρέθηκε σελίδα</li>';sel.innerHTML=o;plist.arr=arr;status();
+}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function tabs(){
+  var ks=Object.keys(cfg.home);[$('tabs'),$('mTabs')].forEach(function(t){if(ks.length<2){t.hidden=true;return}
+  t.hidden=false;t.innerHTML=ks.map(function(l){return'<button type="button" data-l="'+l+'" aria-pressed="'+(l===lang)+'">'+(LANGN[l]||l)+'</button>'}).join('')});
+}
+
+/* ---- fields ---- */
+function openPage(x){
+  cur=x;plist();$('fl').innerHTML='<p class="empty">Φόρτωση…</p>';
+  fetch(x.f,{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
+    var doc=new DOMParser().parseFromString(html,'text/html'),seen={},out=[];
+    E.units(doc.body,function(el,k,d,ch){
+      if(!!x.chrome!==ch)return;
+      var hid=!!(el.closest&&el.closest('[aria-hidden="true"]'));
+      if(seen[k]){if(!hid&&seen[k].hid){seen[k].hid=false;seen[k].tag=el.tagName.toUpperCase()}return}
+      seen[k]={k:k,d:d,tag:el.tagName.toUpperCase(),hid:hid};out.push(seen[k]);
+    });
+    fields=out.filter(function(f){return!f.hid});draw();
+    var pv=$('pv');if(pv.getAttribute('data-f')!==x.f){pv.setAttribute('data-f',x.f);if(pvOn())pv.src=x.f;else pv.removeAttribute('src')}else reloadPv(1);
+  }).catch(function(){$('fl').innerHTML='<p class="empty">Η σελίδα δεν φορτώθηκε. Δοκιμάστε ξανά.</p>'});
+}
+function draw(){
+  var fl=$('fl'),h='<h2>'+esc(cur.t)+'</h2><p class="sub">'+(cur.chrome?'Το μενού, το υποσέλιδο και τα κοινά κουμπιά. Κάθε αλλαγή εδώ ισχύει σε όλες τις σελίδες.':'Αλλάξτε όποιο κείμενο θέλετε και πατήστε «Δημοσίευση».')+'</p>';
+  if(!fields.length)h+='<p class="empty">Δεν υπάρχουν κείμενα για αλλαγή εδώ.</p>';
+  fields.forEach(function(f,i){
+    var v=val(f.k,cur.p),isH=/^H[1-3]$/.test(f.tag),inAll=f.k.charAt(0)==='m'&&draft.all[f.k]!==undefined;
+    h+='<div class="f'+(isH?' h':'')+'" data-i="'+i+'"><div class="lb"><span>'+(LAB[f.tag]||'Κείμενο')+'</span><b></b></div>'
+     +'<textarea rows="1" spellcheck="true" aria-label="'+esc(LAB[f.tag]||'Κείμενο')+'">'+esc(v===undefined?f.d:v)+'</textarea>'
+     +(f.d.indexOf('⟦')>-1?'<div class="hint">Οι λέξεις μέσα σε ⟦ ⟧ είναι έντονες ή σύνδεσμος. Αλλάξτε τις λέξεις, αφήστε τις αγκύλες.</div>':'')
+     +'<div class="msg" hidden></div><div class="ft">'
+     +(f.k.charAt(0)==='m'?'<label><input type="checkbox" class="all"'+(inAll?' checked':'')+'> Ίδια αλλαγή σε όλες τις σελίδες με αυτό το κείμενο</label>':'')
+     +'<button type="button" class="lnk rs" hidden>Επαναφορά</button></div></div>';
+  });
+  fl.innerHTML=h;fl.scrollTop=0;
+  [].forEach.call(fl.querySelectorAll('.f'),function(b){grow(b.querySelector('textarea'));mark(b)});
+}
+function grow(t){t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
+function mark(b){
+  var f=fields[+b.getAttribute('data-i')],v=val(f.k,cur.p),pv=pval(f.k,cur.p),ch=v!==undefined&&v!==f.d,un=(v===undefined?f.d:v)!==(pv===undefined?f.d:pv);
+  b.classList.toggle('ch',un);b.classList.toggle('ed',ch);b.querySelector('.lb b').textContent=un?'δεν έχει δημοσιευτεί':(ch?'αλλαγμένο':'');
+  b.querySelector('.rs').hidden=!ch;
+}
+function onInput(b){
+  var f=fields[+b.getAttribute('data-i')],t=b.querySelector('textarea'),v=t.value.replace(/[ \t]+/g,' ').replace(/ ?\n ?/g,'\n').trim(),m=b.querySelector('.msg'),all=b.querySelector('.all');
+  grow(t);
+  var bad=!v?'Το κείμενο δεν μπορεί να μείνει κενό.':E.shape(v)!==E.shape(f.d)?(f.d.indexOf('⟦')>-1||v.indexOf('⟦')>-1||v.indexOf('⟧')>-1?'Κρατήστε τις αγκύλες ⟦ ⟧ όπως ήταν: ίδιο πλήθος, με την ίδια σειρά.':'Εδώ το κείμενο μένει σε μία γραμμή.'):'';
+  b.classList.toggle('bad',!!bad);m.hidden=!bad;m.textContent=bad;
+  if(bad)return;
+  setVal(f,v,all&&all.checked);mark(b);
+}
+
+/* ---- preview ---- */
+function pvOn(){return!matchMedia('(max-width:1100px)').matches||$('app').classList.contains('showpv')}
+function reloadPv(now){clearTimeout(reloadPv.t);reloadPv.t=setTimeout(function(){var pv=$('pv');if(!pvOn())return;try{if(!pv.getAttribute('src'))pv.src=pv.getAttribute('data-f');else pv.contentWindow.location.reload()}catch(e){}},now?0:650)}
+function hl(k){focusK=k;try{$('pv').contentWindow.postMessage({aded:'hl',k:k},location.origin)}catch(e){}}
+function fit(){
+  var box=$('box'),pv=$('pv');if(matchMedia('(max-width:1100px)').matches){pv.style.cssText='';return}
+  box.classList.toggle('ph',dev==='p');
+  if(dev==='p'){pv.style.cssText='';return}
+  var w=box.clientWidth,hh=box.clientHeight,W=1280,s=w/W;pv.style.width=W+'px';pv.style.height=Math.ceil(hh/s)+'px';pv.style.transform='scale('+s+')';
+}
+
+/* ---- boot ---- */
+function start(){
+  fetch('assets/ed/site.json',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){
+    cfg=c;lang=Object.keys(c.home)[0];
+    return TRIAL?(ls(K.trial)||pub):api('content').then(function(j){return j&&j.pages?j:pub});
+  }).then(function(p){
+    pub={v:1,t:p.t||'',pages:p.pages||{},all:p.all||{}};
+    var d=ls(K.draft);draft=d&&d.base===pub.t?d:copy(pub);draft.base=pub.t;draft.pages=draft.pages||{};draft.all=draft.all||{};ls(K.draft,draft);
+    $('login').hidden=true;$('app').hidden=false;tabs();plist();openPage(plist.arr[1]||plist.arr[0]);fit();
+    if(!ls('aded:seen:'+SITE)){ls('aded:seen:'+SITE,1);$('ovHelp').hidden=false}
+  }).catch(function(){toast('Κάτι δεν φορτώθηκε. Ανανεώστε τη σελίδα.')});
+}
+function publish(){
+  var c={v:1,pages:draft.pages,all:draft.all};
+  if(TRIAL){ls(K.tprev,pub);c.t=new Date().toISOString();ls(K.trial,c);done(c);toast('Δημοσιεύτηκε δοκιμαστικά. Ανοίξτε την ιστοσελίδα σε αυτή τη συσκευή για να το δείτε.');return}
+  $('bPub').disabled=true;
+  api('save',{content:c}).then(function(j){if(j._s===401){relog();return}if(!j.ok){toast('Δεν αποθηκεύτηκε. Δοκιμάστε ξανά.');status();return}done(j.content);toast('Δημοσιεύτηκε. Οι αλλαγές φαίνονται στην ιστοσελίδα σε λίγα δευτερόλεπτα.')}).catch(function(){toast('Χωρίς σύνδεση. Δοκιμάστε ξανά.');status()});
+}
+function done(c){pub={v:1,t:c.t,pages:copy(c.pages||{}),all:copy(c.all||{})};draft=copy(pub);draft.base=pub.t;ls(K.draft,draft);status();[].forEach.call(document.querySelectorAll('#fl .f'),mark)}
+function undo(){
+  if(TRIAL){var p=ls(K.tprev);if(!p){toast('Δεν υπάρχει προηγούμενη δημοσίευση.');return}var now=copy(pub);p.t=new Date().toISOString();ls(K.trial,p);ls(K.tprev,now);done(p);draw();reloadPv(1);toast('Έγινε αναίρεση.');return}
+  api('undo',{}).then(function(j){if(j._s===401){relog();return}if(!j.ok){toast('Δεν υπάρχει προηγούμενη δημοσίευση.');return}done(j.content);draw();reloadPv(1);toast('Έγινε αναίρεση.')});
+}
+function relog(){try{sessionStorage.removeItem(K.tok)}catch(e){}token='';$('app').hidden=true;$('login').hidden=false;$('lgErr').textContent='Η σύνδεση έληξε. Γράψτε ξανά τον κωδικό σας — οι αλλαγές σας δεν χάθηκαν.'}
+
+if(TRIAL){$('lgTrial').hidden=false;$('goTrial').onclick=start}
+else{$('lgLive').hidden=false;try{token=sessionStorage.getItem(K.tok)||''}catch(e){}if(token)start();
+  $('lgLive').onsubmit=function(e){e.preventDefault();var er=$('lgErr');er.textContent='';
+    api('login',{pass:$('pass').value}).then(function(j){
+      if(j.ok){token=j.token;try{sessionStorage.setItem(K.tok,token)}catch(x){}$('pass').value='';start()}
+      else er.textContent=j.error==='locked'?'Πολλές λάθος προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.':j.error==='not_ready'?'Το Admin Panel δεν έχει ενεργοποιηθεί ακόμη. Επικοινωνήστε μαζί μας.':'Λάθος κωδικός.';
+    }).catch(function(){er.textContent='Χωρίς σύνδεση. Δοκιμάστε ξανά.'})}}
+
+$('pages').addEventListener('click',function(e){var b=e.target.closest('button[data-i]');if(b)openPage(plist.arr[+b.getAttribute('data-i')])});
+$('mSel').addEventListener('change',function(){openPage(plist.arr[+this.value])});
+[$('tabs'),$('mTabs')].forEach(function(T){T.addEventListener('click',function(e){var b=e.target.closest('button[data-l]');if(!b)return;lang=b.getAttribute('data-l');tabs();cur=null;plist();openPage(plist.arr[1]||plist.arr[0])});});
+$('q').addEventListener('input',plist);
+$('fl').addEventListener('input',function(e){var b=e.target.closest('.f');if(b&&e.target.tagName==='TEXTAREA')onInput(b)});
+$('fl').addEventListener('change',function(e){var b=e.target.closest('.f');if(b&&e.target.classList.contains('all'))onInput(b)});
+$('fl').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.tagName==='TEXTAREA'){var f=fields[+e.target.closest('.f').getAttribute('data-i')];if(f.d.indexOf('\n')<0)e.preventDefault()}});
+$('fl').addEventListener('focusin',function(e){var b=e.target.closest('.f');if(b&&e.target.tagName==='TEXTAREA')hl(fields[+b.getAttribute('data-i')].k)});
+$('fl').addEventListener('click',function(e){if(!e.target.classList.contains('rs'))return;var b=e.target.closest('.f'),f=fields[+b.getAttribute('data-i')],t=b.querySelector('textarea'),a=b.querySelector('.all');t.value=f.d;if(a)a.checked=false;onInput(b)});
+$('pv').addEventListener('load',function(){if(focusK)setTimeout(function(){hl(focusK)},450)});
+window.addEventListener('message',function(e){
+  if(e.origin!==location.origin||!e.data||e.data.aded!=='pick')return;
+  for(var i=0;i<fields.length;i++)if(fields[i].k===e.data.k){var b=document.querySelector('#fl .f[data-i="'+i+'"]');$('app').classList.remove('showpv');b.scrollIntoView({block:'center'});b.querySelector('textarea').focus({preventScroll:true});return}
+  if(!cur.chrome&&String(e.data.k).charAt(0)==='c')toast('Αυτό το κείμενο ανήκει στο «Μενού & υποσέλιδο» (πρώτη επιλογή της λίστας).');
+});
+$('bPub').onclick=publish;
+$('bHelp').onclick=$('bHelp2').onclick=function(){$('ovMore').hidden=true;$('ovHelp').hidden=false};
+$('bMore').onclick=function(){$('ovMore').hidden=false};
+$('bUndo').onclick=function(){$('ovMore').hidden=true;undo()};
+$('bDiscard').onclick=function(){$('ovMore').hidden=true;draft=copy(pub);draft.base=pub.t;ls(K.draft,draft);status();draw();reloadPv(1);toast('Οι μη δημοσιευμένες αλλαγές σβήστηκαν.')};
+$('bOut').onclick=function(){try{sessionStorage.removeItem(K.tok)}catch(e){}location.reload()};
+[].forEach.call(document.querySelectorAll('.ov'),function(o){o.addEventListener('click',function(e){if(e.target===o||e.target.hasAttribute('data-close'))o.hidden=true})});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')[].forEach.call(document.querySelectorAll('.ov'),function(o){o.hidden=true})});
+$('dvD').onclick=function(){dev='d';this.setAttribute('aria-pressed','true');$('dvP').setAttribute('aria-pressed','false');fit()};
+$('dvP').onclick=function(){dev='p';this.setAttribute('aria-pressed','true');$('dvD').setAttribute('aria-pressed','false');fit()};
+$('fab').onclick=function(){$('app').classList.add('showpv');reloadPv(1)};
+$('pvClose').onclick=function(){$('app').classList.remove('showpv')};
+window.addEventListener('resize',fit);
+window.addEventListener('beforeunload',function(e){if(draft&&diff().n&&!TRIAL){e.preventDefault();e.returnValue=''}});
+})();
+</script>
+</body>
+</html>
